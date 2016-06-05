@@ -119,8 +119,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdReclaimVariableSpaceAtEndOfDxe  ## CONSUMES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics  ## CONSUMES # statistic the information of variable.
-  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate ## CONSUMES # Auto update PlatformLang/Lang
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics               ## CONSUMES # statistic the information of variable.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageGetBaseAddressAtRuntime   ## CONSUMES # Get a (possibly different) base address at runtime
+  gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultLangDeprecate              ## CONSUMES # Auto update PlatformLang/Lang
 
 [Depex]
   TRUE

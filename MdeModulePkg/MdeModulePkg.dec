@@ -518,6 +518,14 @@
   # @Prompt Enable Device Path From Text support.
   gEfiMdeModulePkgTokenSpaceGuid.PcdDevicePathSupportDevicePathFromText|TRUE|BOOLEAN|0x00010038
 
+  ## Indicates if the non-volatile variable store base address needs to be updated at runtime.
+  #  This is necessary if the base address for the non-volatile variable store is expected
+  #  to change at runtime.<BR><BR>
+  #   TRUE  - Non-volatile variable store base address is expected to change. Call GetBaseAddress() at runtime.<BR>
+  #   FALSE - Non-volatile variable store base address is not expected to change. Don't call GetBaseAddress() at runtime.<BR>
+  # @Prompt Enable non-volatile variable store base address switch at runtime.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageGetBaseAddressAtRuntime|FALSE|BOOLEAN|0x00010039
+
   ## Indicates if the statistics about variable usage will be collected. This information is
   #  stored as a vendor configuration table into the EFI system table.
   #  Set this PCD to TRUE to use VariableInfo application in MdeModulePkg\Application directory to get

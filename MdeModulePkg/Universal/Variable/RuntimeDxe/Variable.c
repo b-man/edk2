@@ -53,6 +53,11 @@ VARIABLE_INFO_ENTRY    *gVariableInfo         = NULL;
 BOOLEAN                mEndOfDxe              = FALSE;
 
 ///
+/// The flag to indicate whether the non-volatile variable store base has been relocated.
+///
+BOOLEAN   mNonVolatileVariableBaseRelocated   = FALSE;
+
+///
 /// It indicates the var check request source.
 /// In the implementation, DXE is regarded as untrusted, and SMM is trusted.
 ///
@@ -2158,6 +2163,7 @@ UpdateVariable (
   BOOLEAN                             IsCommonVariable;
   BOOLEAN                             IsCommonUserVariable;
   AUTHENTICATED_VARIABLE_HEADER       *AuthVariable;
+  EFI_PHYSICAL_ADDRESS                RuntimeNonVolatileVariableBasePtr;
 
   if (mVariableModuleGlobal->FvbInstance == NULL) {
     //
@@ -2176,6 +2182,26 @@ UpdateVariable (
       //
       DEBUG ((EFI_D_ERROR, "Update AUTH variable before EFI_VARIABLE_WRITE_ARCH_PROTOCOL ready - %r\n", EFI_NOT_AVAILABLE_YET));
       return EFI_NOT_AVAILABLE_YET;
+    }
+  }
+
+  Fvb = mVariableModuleGlobal->FvbInstance;
+
+  //
+  // Assign address passed by GetPhysicalAddress to NonVolatileVariableBase during runtime.
+  // This is necessary when non-volatile variables need to be stored in RAM and written to
+  // storage later, due to platforms that lack a dedicated storage device for
+  // storing firmware variables.
+  //
+  if (FeaturePcdGet (PcdFlashNvStorageGetBaseAddressAtRuntime)) {
+    if (!mNonVolatileVariableBaseRelocated && AtRuntime ()) {
+      Status = Fvb->GetPhysicalAddress (Fvb, &RuntimeNonVolatileVariableBasePtr);
+      ASSERT_EFI_ERROR (Status);
+      mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = RuntimeNonVolatileVariableBasePtr + (mNvFvHeaderCache->HeaderLength);
+      //
+      // This only needs to be done once.
+      //
+      mNonVolatileVariableBaseRelocated = TRUE;
     }
   }
 
@@ -2229,8 +2255,6 @@ UpdateVariable (
     }
     Variable->Volatile = FALSE;
   }
-
-  Fvb       = mVariableModuleGlobal->FvbInstance;
 
   //
   // Tricky part: Use scratch data area at the end of volatile variable store
@@ -4169,4 +4193,3 @@ GetFvbInfoByAddress (
 
   return Status;
 }
-
